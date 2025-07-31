@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
 import { mainnetEnsDomain } from "@/config/constants"
+import { useAccount } from "wagmi";
 
 /**
  * SubnameForm Component
@@ -25,7 +26,7 @@ import { mainnetEnsDomain } from "@/config/constants"
 export function SubnameForm() {
   // Hook from JustAName SDK to handle subname creation
   const { addSubname, isAddSubnamePending } = useAddSubname();
-  
+  const { address } = useAccount(); 
   // Form state management
   const [key, setKey] = useState<string>('');        // Metadata key (e.g., "twitter", "email")
   const [value, setValue] = useState<string>('');    // Metadata value (e.g., "@username", "user@email.com")
@@ -79,6 +80,9 @@ export function SubnameForm() {
               [key]: value,
             }
           : undefined,
+      addresses: {
+        2147492101: address // Base address, can be changed to any other cointype
+      }
     });
   };
 

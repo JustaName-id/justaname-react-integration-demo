@@ -5,8 +5,10 @@ import {ConnectWallet} from "./components/wallet/ConnectWallet";
 import {SubnameDisplay} from "./components/subname/SubnameDisplay";
 import {SubnameForm} from "./components/subname/SubnameForm";
 import {SubnamesList} from "./components/subname/SubnamesList";
+import {ResolveEns} from "./components/subname/ResolveEns";
 import {DebugPanel} from "./components/debug/DebugPanel";
 import {useAccountSubnames} from "@justaname.id/react";
+import { Toaster } from "./components/ui/sonner";
 
 export default function App() {
 
@@ -32,6 +34,7 @@ export default function App() {
 
                 {/* Main Content */}
                 <div className="space-y-8">
+                
                     {/* Wallet Connection */}
                     <div className="flex justify-center">
                         <ConnectWallet/>
@@ -54,6 +57,11 @@ export default function App() {
                             )}
                         </div>
                     )}
+
+                     {/* ENS Resolution - Always displayed */}
+                     <div className="flex justify-center">
+                        <ResolveEns />
+                    </div>
                 </div>
 
                 {/* Footer */}
@@ -64,6 +72,9 @@ export default function App() {
                 {/* Debug Panel (dev only) */}
                 <DebugPanel/>
             </div>
+            
+            {/* Toast notifications */}
+            <Toaster />
         </div>
     )
 }

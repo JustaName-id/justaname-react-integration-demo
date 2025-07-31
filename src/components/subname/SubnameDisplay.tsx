@@ -9,6 +9,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Trash2, Plus, Save } from 'lucide-react'
+import { toast } from 'sonner'
 
 /**
  * Props interface for SubnameDisplay component
@@ -122,8 +123,10 @@ export function SubnameDisplay({ subname }: SubnameDisplayProps) {
         ensDomain,
         chainId: 1,
       });
+      toast.success('Subname revoked successfully');
     } catch (error) {
       console.error('Failed to revoke subname:', error);
+      toast.error(`Failed to revoke subname: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsRevoking(false);
     }
@@ -165,8 +168,10 @@ export function SubnameDisplay({ subname }: SubnameDisplayProps) {
         addresses: Object.keys(addresses).length > 0 ? addresses : undefined,
         contentHash: contentHash.trim() || undefined,
       });
+      toast.success('Records updated successfully');
     } catch (error) {
       console.error('Failed to update subname:', error);
+      toast.error(`Failed to update records: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsUpdating(false);
     }
@@ -204,6 +209,7 @@ export function SubnameDisplay({ subname }: SubnameDisplayProps) {
   /**
    * Address Record Management Functions
    * These functions handle adding, updating, and removing address records
+   * Note: CoinType 60 (ETH) records cannot be edited or deleted
    */
   
   // Add a new empty address record
@@ -217,16 +223,31 @@ export function SubnameDisplay({ subname }: SubnameDisplayProps) {
   };
 
   // Update a specific field in an address record
+  // CoinType 60 (ETH) records cannot be edited
   const updateAddressRecord = (id: string, field: 'coinType' | 'address', value: string) => {
     setAddressRecords(records => 
-      records.map(record => 
-        record.id === id ? { ...record, [field]: value } : record
-      )
+      records.map(record => {
+        if (record.id === id) {
+          // Prevent editing coinType 60 (ETH) records
+          if (record.coinType === '60' && field === 'coinType') {
+            toast.error('ETH address records cannot be modified');
+            return record;
+          }
+          return { ...record, [field]: value };
+        }
+        return record;
+      })
     );
   };
 
   // Remove an address record by ID
+  // CoinType 60 (ETH) records cannot be deleted
   const removeAddressRecord = (id: string) => {
+    const record = addressRecords.find(r => r.id === id);
+    if (record?.coinType === '60') {
+      toast.error('ETH address records cannot be deleted');
+      return;
+    }
     setAddressRecords(records => records.filter(record => record.id !== id));
   };
 
@@ -339,34 +360,47 @@ export function SubnameDisplay({ subname }: SubnameDisplayProps) {
 
             <div className="space-y-3">
               {/* Map through all address records */}
-              {addressRecords.map((record) => (
-                <div key={record.id} className="flex gap-2 items-center">
-                  <div className="flex-1">
-                    {/* Coin type input field */}
-                    <Input
-                      placeholder="Coin Type (e.g., ETH, BTC)"
-                      value={record.coinType}
-                      onChange={(e) => updateAddressRecord(record.id, 'coinType', e.target.value)}
-                      className="mb-2"
-                    />
-                    {/* Address input field */}
-                    <Input
-                      placeholder="Address"
-                      value={record.address}
-                      onChange={(e) => updateAddressRecord(record.id, 'address', e.target.value)}
-                    />
+              {addressRecords.map((record) => {
+                const isEthRecord = record.coinType === '60';
+                return (
+                  <div key={record.id} className="flex gap-2 items-center">
+                    <div className="flex-1">
+                      {/* Coin type input field */}
+                      <Input
+                        placeholder="Coin Type (e.g., ETH, BTC)"
+                        value={record.coinType}
+                        onChange={(e) => updateAddressRecord(record.id, 'coinType', e.target.value)}
+                        className="mb-2"
+                        disabled={isEthRecord}
+                  
+                      />
+                      {/* Address input field */}
+                      <Input
+                        placeholder="Address"
+                        value={record.address}
+                        onChange={(e) => updateAddressRecord(record.id, 'address', e.target.value)}
+                        disabled={isEthRecord}
+                      />
+                      {/* Show indicator for ETH records */}
+                      {isEthRecord && (
+                        <div className="text-xs text-muted-foreground mt-1">
+                          ETH address records cannot be modified
+                        </div>
+                      )}
+                    </div>
+                    {/* Delete button for this record */}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => removeAddressRecord(record.id)}
+                      className="text-red-600 hover:text-red-700"
+                      disabled={isEthRecord}
+                    >
+                      <Trash2 size={16} />
+                    </Button>
                   </div>
-                  {/* Delete button for this record */}
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => removeAddressRecord(record.id)}
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    <Trash2 size={16} />
-                  </Button>
-                </div>
-              ))}
+                );
+              })}
 
               {/* Empty state when no address records exist */}
               {addressRecords.length === 0 && (

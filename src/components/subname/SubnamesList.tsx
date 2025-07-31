@@ -71,10 +71,7 @@ export function SubnamesList() {
             </div>
           ))}
         </div>
-        {/* Helper text explaining how to manage individual subnames */}
-        <div className="text-xs text-muted-foreground text-center mt-4">
-          Manage individual subnames by selecting them from the interface above
-        </div>
+        
       </CardContent>
     </Card>
   );
