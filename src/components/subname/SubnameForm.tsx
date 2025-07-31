@@ -1,22 +1,25 @@
-"use client"
-import {
-  useAddSubname,
-  useIsSubnameAvailable,
-} from "@justaname.id/react";
+"use client";
+import { useAddSubname, useIsSubnameAvailable } from "@justaname.id/react";
 import { useMemo, useState } from "react";
 import { useDebounce } from "@/hooks/use-debounce";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Spinner } from '@/components/ui/spinner'
-import { mainnetEnsDomain } from "@/config/constants"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Spinner } from "@/components/ui/spinner";
+import { mainnetEnsDomain } from "@/config/constants";
 import { useAccount } from "wagmi";
 
 /**
  * SubnameForm Component
- * 
+ *
  * This component handles the creation of new ENS subnames. It provides:
  * - Real-time availability checking for subnames
  * - Optional metadata (text records) configuration
@@ -26,11 +29,11 @@ import { useAccount } from "wagmi";
 export function SubnameForm() {
   // Hook from JustAName SDK to handle subname creation
   const { addSubname, isAddSubnamePending } = useAddSubname();
-  const { address } = useAccount(); 
+  const { address } = useAccount();
   // Form state management
-  const [key, setKey] = useState<string>('');        // Metadata key (e.g., "twitter", "email")
-  const [value, setValue] = useState<string>('');    // Metadata value (e.g., "@username", "user@email.com")
-  const [username, setUsername] = useState<string>(''); // The subname part (e.g., "alice" for "alice.eth")
+  const [key, setKey] = useState<string>(""); // Metadata key (e.g., "twitter", "email")
+  const [value, setValue] = useState<string>(""); // Metadata value (e.g., "@username", "user@email.com")
+  const [username, setUsername] = useState<string>(""); // The subname part (e.g., "alice" for "alice.eth")
 
   // Debounce username input to avoid excessive API calls while typing
   // Waits 500ms after user stops typing before checking availability
@@ -38,14 +41,17 @@ export function SubnameForm() {
 
   // Hook to check if the subname is available for registration
   // Only checks when there's a debounced username value
-  const { isSubnameAvailable, isSubnameAvailablePending: isCheckingAvailability } = useIsSubnameAvailable({
+  const {
+    isSubnameAvailable,
+    isSubnameAvailablePending: isCheckingAvailability,
+  } = useIsSubnameAvailable({
     username: debouncedUsername.debouncedValue,
     ensDomain: mainnetEnsDomain,
   });
 
   /**
    * Form validation logic
-   * 
+   *
    * The form is valid when:
    * 1. The subname is available (not already taken)
    * 2. User has entered a username (length > 0)
@@ -56,14 +62,14 @@ export function SubnameForm() {
     return (
       isSubnameAvailable?.isAvailable &&
       debouncedUsername.debouncedValue.length > 0 &&
-      !(key.length > 0 && value === '') &&
-      !(key === '' && value.length > 0)
+      !(key.length > 0 && value === "") &&
+      !(key === "" && value.length > 0)
     );
   }, [isSubnameAvailable, debouncedUsername.debouncedValue, key, value]);
 
   /**
    * Handle form submission
-   * 
+   *
    * Creates the subname with optional metadata if provided.
    * The metadata is structured as text records that can be queried
    * by other applications (e.g., wallet apps, dApps).
@@ -81,14 +87,14 @@ export function SubnameForm() {
             }
           : undefined,
       addresses: {
-        2147492101: address // Base address, can be changed to any other cointype
-      }
+        2147492101: address, // Base address, can be changed to any other cointype, computed by base chain ID (8453) + SLIP44_MSB (2147483648)
+      },
     });
   };
 
   /**
    * Get availability status badge
-   * 
+   *
    * Returns different badges based on the current state:
    * - null: No username entered
    * - "Checking...": Currently checking availability
@@ -97,8 +103,17 @@ export function SubnameForm() {
    */
   const getAvailabilityStatus = () => {
     if (!debouncedUsername.debouncedValue) return null;
-    if (isCheckingAvailability) return <Badge variant="outline">Checking...</Badge>;
-    if (isSubnameAvailable?.isAvailable) return <Badge variant="secondary" className="bg-green-100 text-green-700 border-green-200">Available</Badge>;
+    if (isCheckingAvailability)
+      return <Badge variant="outline">Checking...</Badge>;
+    if (isSubnameAvailable?.isAvailable)
+      return (
+        <Badge
+          variant="secondary"
+          className="bg-green-100 text-green-700 border-green-200"
+        >
+          Available
+        </Badge>
+      );
     return <Badge variant="destructive">Not Available</Badge>;
   };
 
@@ -110,7 +125,7 @@ export function SubnameForm() {
           Create your personalized ENS subname with optional metadata
         </CardDescription>
       </CardHeader>
-      
+
       <CardContent>
         <div onSubmit={handleSubmit} className="space-y-6">
           {/* Subname Input Section */}
@@ -148,7 +163,9 @@ export function SubnameForm() {
             <div className="grid grid-cols-2 gap-3">
               {/* Metadata Key Input */}
               <div className="space-y-2">
-                <Label htmlFor="key" className="text-sm">Key</Label>
+                <Label htmlFor="key" className="text-sm">
+                  Key
+                </Label>
                 <Input
                   id="key"
                   type="text"
@@ -159,7 +176,9 @@ export function SubnameForm() {
               </div>
               {/* Metadata Value Input */}
               <div className="space-y-2">
-                <Label htmlFor="value" className="text-sm">Value</Label>
+                <Label htmlFor="value" className="text-sm">
+                  Value
+                </Label>
                 <Input
                   id="value"
                   type="text"
@@ -184,7 +203,7 @@ export function SubnameForm() {
                 <span>Claiming Subname...</span>
               </div>
             ) : (
-              'Claim Subname'
+              "Claim Subname"
             )}
           </Button>
         </div>
