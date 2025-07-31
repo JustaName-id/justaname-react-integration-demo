@@ -68,19 +68,21 @@ A comprehensive demonstration of how to integrate [JustAName](https://justaname.
 Create a `.env` file in the root directory:
 
 ```env
-# Optional: Custom RPC endpoint
-VITE_RPC_URL=https://eth-mainnet.g.alchemy.com/v2/YOUR_API_KEY
-
-# Optional: Custom ENS domain (defaults to .eth)
-VITE_ENS_DOMAIN=eth
+# Required: JustAName API configuration
+VITE_APP_ORIGIN=http://localhost:3000
+VITE_APP_DOMAIN=localhost
+VITE_APP_MAINNET_PROVIDER_URL=https://eth-mainnet.g.alchemy.com/v2/YOUR_API_KEY
+VITE_APP_MAINNET_ENS_DOMAIN=[name.eth]
+VITE_APP_MAINNET_API_KEY=your_justaname_api_key_here
 ```
 
 ### JustAName SDK Configuration
-The demo uses the JustAName React SDK which is configured in `src/wagmi/config.ts`. Key configuration points:
+The demo uses the JustAName React SDK which is configured in `src/providers.tsx`. Key configuration points:
 
 - **Network**: Mainnet Ethereum (chainId: 1)
 - **ENS Domain**: `.eth` (configurable)
 - **Wallet Connection**: Supports all major wallets via Wagmi
+- **JustANameProvider**: Wraps the app to provide JustAName functionality
 
 ## 📖 Usage Examples
 
@@ -203,11 +205,16 @@ src/
 - **Features**: Text records, address records, content hash management
 - **Actions**: Update records, revoke subname
 
+### JustANameProvider
+- **Purpose**: Provides JustAName functionality to the entire app
+- **Configuration**: Handles API keys, network settings, and ENS domain configuration
+- **Required**: Must wrap your app for all JustAName hooks to work
+
 ## 🎯 Integration Guide
 
 ### 1. Install Dependencies
 ```bash
-npm install @justaname.id/react wagmi viem
+npm install @justaname.id/react wagmi viem @tanstack/react-query
 ```
 
 ### 2. Configure Wagmi
@@ -226,20 +233,41 @@ export const config = createConfig({
 })
 ```
 
-### 3. Wrap Your App
+### 3. Wrap Your App with JustANameProvider
 ```tsx
 // src/providers.tsx
 import { WagmiProvider } from 'wagmi'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { JustaNameProvider } from '@justaname.id/react'
 import { config } from './wagmi/config'
 
 const queryClient = new QueryClient()
+
+const justanameConfig = {
+  config: {
+    origin: 'http://localhost:3000',
+    domain: 'localhost',
+  },
+  networks: [
+    {
+      chainId: 1,
+      providerUrl: 'https://eth-mainnet.g.alchemy.com/v2/YOUR_API_KEY',
+    },
+  ],
+  ensDomains: [{
+    ensDomain: '.eth',
+    chainId: 1,
+    apiKey: 'your_justaname_api_key_here',
+  }],
+}
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        {children}
+        <JustaNameProvider config={justanameConfig}>
+          {children}
+        </JustaNameProvider>
       </QueryClientProvider>
     </WagmiProvider>
   )
@@ -262,6 +290,8 @@ function MyApp() {
 }
 ```
 
+**Important**: The JustANameProvider must wrap your app for all hooks to work properly.
+
 ## 🚨 Important Notes
 
 ### Security Considerations
@@ -270,15 +300,12 @@ function MyApp() {
 - **Network Selection**: Ensure users are on the correct network (Mainnet)
 
 ### Best Practices
+- **JustANameProvider**: Always wrap your app with JustANameProvider for hooks to work
 - **Debouncing**: Always debounce user input for availability checks
 - **Loading States**: Provide clear feedback during blockchain operations
 - **Error Handling**: Implement comprehensive error handling
 - **Validation**: Validate all user inputs before submission
-
-### Limitations
-- **ENS Domain**: Currently supports `.eth` domain (configurable)
-- **Network**: Mainnet Ethereum only
-- **Wallet Support**: Requires wallet with ENS support
+- **API Keys**: Keep your JustAName API key secure and leverage the domain allow list to secure it
 
 ## 🤝 Contributing
 
