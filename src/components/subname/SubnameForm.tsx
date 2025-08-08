@@ -78,6 +78,7 @@ export function SubnameForm() {
     e.preventDefault();
     if (!isFormValid || isAddSubnamePending) return;
 
+    // signature can be overriden if needed by passing `overrideSignatureCheck: true`
     addSubname({
       username: debouncedUsername.debouncedValue,
       text:

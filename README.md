@@ -5,6 +5,7 @@ A comprehensive demonstration of how to integrate [JustAName](https://justaname.
 ## 🚀 Features
 
 ### Core Functionality
+
 - **Subname Claiming**: Create new ENS subnames with real-time availability checking
 - **Metadata Management**: Add and edit text records (email, Twitter, URLs, etc.)
 - **Address Records**: Manage cryptocurrency addresses for different chains
@@ -12,6 +13,7 @@ A comprehensive demonstration of how to integrate [JustAName](https://justaname.
 - **Subname Revocation**: Permanently delete subnames when no longer needed
 
 ### User Experience
+
 - **Real-time Validation**: Instant feedback on subname availability
 - **Debounced Input**: Optimized API calls with 500ms debouncing
 - **Loading States**: Clear visual feedback during blockchain operations
@@ -19,6 +21,7 @@ A comprehensive demonstration of how to integrate [JustAName](https://justaname.
 - **Modern UI**: Built with shadcn/ui components and Tailwind CSS
 
 ### Technical Features
+
 - **TypeScript**: Full type safety throughout the application
 - **React Hooks**: Custom hooks for debouncing and mobile detection
 - **Wagmi Integration**: Ethereum wallet connection and transaction handling
@@ -36,12 +39,14 @@ A comprehensive demonstration of how to integrate [JustAName](https://justaname.
 ## 📦 Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/your-username/justaname-aurora-integration-demo.git
    cd justaname-aurora-integration-demo
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    # or
@@ -51,6 +56,7 @@ A comprehensive demonstration of how to integrate [JustAName](https://justaname.
    ```
 
 3. **Start the development server**
+
    ```bash
    npm run dev
    # or
@@ -65,6 +71,7 @@ A comprehensive demonstration of how to integrate [JustAName](https://justaname.
 ## 🔧 Configuration
 
 ### Environment Variables
+
 Create a `.env` file in the root directory:
 
 ```env
@@ -77,6 +84,7 @@ VITE_APP_MAINNET_API_KEY=your_justaname_api_key_here
 ```
 
 ### JustAName SDK Configuration
+
 The demo uses the JustAName React SDK which is configured in `src/providers.tsx`. Key configuration points:
 
 - **Network**: Mainnet Ethereum (chainId: 1)
@@ -93,17 +101,17 @@ import { useAddSubname } from "@justaname.id/react";
 
 function MyComponent() {
   const { addSubname, isAddSubnamePending } = useAddSubname();
-  
+
   const handleClaim = () => {
     addSubname({
       username: "alice",
       text: {
         email: "alice@example.com",
-        twitter: "@alice"
-      }
+        twitter: "@alice",
+      },
     });
   };
-  
+
   return (
     <button onClick={handleClaim} disabled={isAddSubnamePending}>
       {isAddSubnamePending ? "Claiming..." : "Claim Subname"}
@@ -118,13 +126,14 @@ function MyComponent() {
 import { useIsSubnameAvailable } from "@justaname.id/react";
 
 function AvailabilityChecker() {
-  const { isSubnameAvailable, isSubnameAvailablePending } = useIsSubnameAvailable({
-    username: "alice",
-    ensDomain: "eth"
-  });
-  
+  const { isSubnameAvailable, isSubnameAvailablePending } =
+    useIsSubnameAvailable({
+      username: "alice",
+      ensDomain: "eth",
+    });
+
   if (isSubnameAvailablePending) return <div>Checking...</div>;
-  
+
   return (
     <div>
       {isSubnameAvailable?.isAvailable ? "Available!" : "Already taken"}
@@ -140,23 +149,23 @@ import { useUpdateSubname } from "@justaname.id/react";
 
 function RecordManager() {
   const { updateSubname, isUpdateSubnamePending } = useUpdateSubname();
-  
+
   const updateRecords = () => {
     updateSubname({
       ens: "alice.eth",
       chainId: 1,
       text: {
         email: "newemail@example.com",
-        website: "https://alice.com"
+        website: "https://alice.com",
       },
       addresses: {
         "60": "0x1234...", // ETH address
-        "0": "bc1..."      // BTC address
+        "0": "bc1...", // BTC address
       },
-      contentHash: "ipfs://QmYourHashHere"
+      contentHash: "ipfs://QmYourHashHere",
     });
   };
-  
+
   return (
     <button onClick={updateRecords} disabled={isUpdateSubnamePending}>
       Update Records
@@ -191,21 +200,25 @@ src/
 ## 🔍 Key Components Explained
 
 ### SubnameForm
+
 - **Purpose**: Create new ENS subnames
 - **Features**: Real-time availability checking, metadata configuration
 - **Validation**: Ensures subname availability and proper metadata format
 
 ### SubnamesList
+
 - **Purpose**: Display all user's subnames
 - **Features**: Record count display, status indicators
 - **Behavior**: Only renders when user has subnames
 
 ### SubnameDisplay
+
 - **Purpose**: Manage individual subname records
 - **Features**: Text records, address records, content hash management
 - **Actions**: Update records, revoke subname
 
 ### JustANameProvider
+
 - **Purpose**: Provides JustAName functionality to the entire app
 - **Configuration**: Handles API keys, network settings, and ENS domain configuration
 - **Required**: Must wrap your app for all JustAName hooks to work
@@ -213,16 +226,18 @@ src/
 ## 🎯 Integration Guide
 
 ### 1. Install Dependencies
+
 ```bash
 npm install @justaname.id/react wagmi viem @tanstack/react-query
 ```
 
 ### 2. Configure Wagmi
+
 ```tsx
 // src/wagmi/config.ts
-import { createConfig, http } from 'wagmi'
-import { mainnet } from 'wagmi/chains'
-import { injected, walletConnect } from 'wagmi/connectors'
+import { createConfig, http } from "wagmi";
+import { mainnet } from "wagmi/chains";
+import { injected, walletConnect } from "wagmi/connectors";
 
 export const config = createConfig({
   chains: [mainnet],
@@ -230,36 +245,39 @@ export const config = createConfig({
   transports: {
     [mainnet.id]: http(),
   },
-})
+});
 ```
 
 ### 3. Wrap Your App with JustANameProvider
+
 ```tsx
 // src/providers.tsx
-import { WagmiProvider } from 'wagmi'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { JustaNameProvider } from '@justaname.id/react'
-import { config } from './wagmi/config'
+import { WagmiProvider } from "wagmi";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { JustaNameProvider } from "@justaname.id/react";
+import { config } from "./wagmi/config";
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient();
 
 const justanameConfig = {
   config: {
-    origin: 'http://localhost:3000',
-    domain: 'localhost',
+    origin: "http://localhost:3000",
+    domain: "localhost",
   },
   networks: [
     {
       chainId: 1,
-      providerUrl: 'https://eth-mainnet.g.alchemy.com/v2/YOUR_API_KEY',
+      providerUrl: "https://eth-mainnet.g.alchemy.com/v2/YOUR_API_KEY",
     },
   ],
-  ensDomains: [{
-    ensDomain: '.eth',
-    chainId: 1,
-    apiKey: 'your_justaname_api_key_here',
-  }],
-}
+  ensDomains: [
+    {
+      ensDomain: ".eth",
+      chainId: 1,
+      apiKey: "your_justaname_api_key_here",
+    },
+  ],
+};
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -270,17 +288,18 @@ export function Providers({ children }: { children: React.ReactNode }) {
         </JustaNameProvider>
       </QueryClientProvider>
     </WagmiProvider>
-  )
+  );
 }
 ```
 
 ### 4. Use JustAName Hooks
+
 ```tsx
 import { useAddSubname, useAccountSubnames } from "@justaname.id/react";
 
 function MyApp() {
   const { accountSubnames } = useAccountSubnames();
-  
+
   return (
     <div>
       <h1>My Subnames: {accountSubnames.length}</h1>
@@ -295,11 +314,13 @@ function MyApp() {
 ## 🚨 Important Notes
 
 ### Security Considerations
+
 - **Private Keys**: Never expose private keys in client-side code
 - **Transaction Signing**: All transactions require user wallet approval
 - **Network Selection**: Ensure users are on the correct network (Mainnet)
 
 ### Best Practices
+
 - **JustANameProvider**: Always wrap your app with JustANameProvider for hooks to work
 - **Debouncing**: Always debounce user input for availability checks
 - **Loading States**: Provide clear feedback during blockchain operations
@@ -333,7 +354,6 @@ If you encounter any issues or have questions:
 1. Check the [JustAName documentation](https://docs.justaname.id)
 2. Review the [ENS documentation](https://docs.ens.domains)
 3. Open an issue in this repository
-4. Join the [JustAName Discord](https://discord.gg/justaname)
 
 ---
 
