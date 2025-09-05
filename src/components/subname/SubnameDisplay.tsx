@@ -1,24 +1,35 @@
-"use client"
-import { splitDomain, useRevokeSubname, useUpdateSubname, type Records } from "@justaname.id/react";
+"use client";
+import {
+  splitDomain,
+  useRevokeSubname,
+  useUpdateSubname,
+  type Records,
+} from "@justaname.id/react";
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
-import { Spinner } from '@/components/ui/spinner'
-import { Label } from '@/components/ui/label'
-import { Separator } from '@/components/ui/separator'
-import { Trash2, Plus, Save } from 'lucide-react'
-import { toast } from 'sonner'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Trash2, Plus, Save } from "lucide-react";
+import { toast } from "sonner";
 
 /**
  * Props interface for SubnameDisplay component
- * 
+ *
  * @param subname - The ENS subname records object containing all metadata
  *                 including text records, address records, and content hash
  */
 interface SubnameDisplayProps {
-  subname: Records
+  subname: Records;
 }
 
 /**
@@ -26,9 +37,9 @@ interface SubnameDisplayProps {
  * Examples: email -> user@example.com, twitter -> @username
  */
 interface TextRecord {
-  id: string;      // Unique identifier for the record
-  key: string;     // Record key (e.g., "email", "twitter", "url")
-  value: string;   // Record value (e.g., "user@example.com", "@username")
+  id: string; // Unique identifier for the record
+  key: string; // Record key (e.g., "email", "twitter", "url")
+  value: string; // Record value (e.g., "user@example.com", "@username")
 }
 
 /**
@@ -36,14 +47,14 @@ interface TextRecord {
  * Examples: ETH -> 0x123..., BTC -> bc1...
  */
 interface AddressRecord {
-  id: string;        // Unique identifier for the record
-  coinType: string;  // Cryptocurrency type (e.g., "ETH", "BTC", "60", "0")
-  address: string;   // The actual cryptocurrency address
+  id: string; // Unique identifier for the record
+  coinType: string; // Cryptocurrency type (e.g., "ETH", "BTC", "60", "0")
+  address: string; // The actual cryptocurrency address
 }
 
 /**
  * SubnameDisplay Component
- * 
+ *
  * This component provides a comprehensive interface for managing an individual ENS subname.
  * It allows users to:
  * - View and edit text records (key-value metadata)
@@ -51,63 +62,71 @@ interface AddressRecord {
  * - Set content hash (IPFS/Swarm links)
  * - Update all records at once
  * - Revoke (delete) the subname entirely
- * 
+ *
  * The component maintains local state for all records and only updates
  * the blockchain when the user explicitly saves changes.
  */
 export function SubnameDisplay({ subname }: SubnameDisplayProps) {
-  console.log("subname", subname)
-  
-  // Hooks from JustAName SDK for subname operations
+  console.log("subname", subname);
+
+  // Hooks from JustaName SDK for subname operations
   const { revokeSubname, isRevokeSubnamePending } = useRevokeSubname();
   const { updateSubname, isUpdateSubnamePending } = useUpdateSubname();
-  
+
   // Local loading states for better UX
   const [isRevoking, setIsRevoking] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
-  
+
   // State for managing records locally before saving to blockchain
   const [textRecords, setTextRecords] = useState<TextRecord[]>([]);
   const [addressRecords, setAddressRecords] = useState<AddressRecord[]>([]);
-  const [contentHash, setContentHash] = useState<string>('');
+  const [contentHash, setContentHash] = useState<string>("");
 
   /**
    * Initialize records from subname data when component mounts or subname changes
-   * 
+   *
    * This effect converts the subname's records from the blockchain format
    * into the local state format that's easier to work with in the UI.
    */
   useEffect(() => {
     // Convert text records from blockchain format to local state
     if (subname.records.texts) {
-      const records = Object.entries(subname.records.texts).map(([, value], index) => ({
-        id: `text-${index}`,
-        key: value.key,
-        value: typeof value === 'string' ? value : value.value || ''
-      }));
-      console.log("records", records, subname.records.texts)
+      const records = Object.entries(subname.records.texts).map(
+        ([, value], index) => ({
+          id: `text-${index}`,
+          key: value.key,
+          value: typeof value === "string" ? value : value.value || "",
+        })
+      );
+      console.log("records", records, subname.records.texts);
       setTextRecords(records);
     }
 
     // Convert address records from blockchain format to local state
     if (subname.records.coins) {
-      const addresses = Object.entries(subname.records.coins).map(([, address], index) => ({
-        id: `addr-${index}`,
-        coinType: address.id.toString(),
-        address: typeof address === 'string' ? address : address?.value || ''
-      }));
+      const addresses = Object.entries(subname.records.coins).map(
+        ([, address], index) => ({
+          id: `addr-${index}`,
+          coinType: address.id.toString(),
+          address: typeof address === "string" ? address : address?.value || "",
+        })
+      );
       setAddressRecords(addresses);
     }
 
     // Set content hash if it exists
     if (subname.records.contentHash) {
-      setContentHash(typeof subname.records.contentHash === 'string' ? subname.records.contentHash : String(subname.records.contentHash || ''));
+      setContentHash(
+        typeof subname.records.contentHash === "string"
+          ? subname.records.contentHash
+          : String(subname.records.contentHash || "")
+      );
     }
   }, [subname]);
 
   /**
    * Handle subname revocation (permanent deletion)
-   * 
+   *
    * This function:
    * 1. Splits the ENS domain to get username and domain parts
    * 2. Calls the revocation function from the SDK
@@ -123,10 +142,14 @@ export function SubnameDisplay({ subname }: SubnameDisplayProps) {
         ensDomain,
         chainId: 1,
       });
-      toast.success('Subname revoked successfully');
+      toast.success("Subname revoked successfully");
     } catch (error) {
-      console.error('Failed to revoke subname:', error);
-      toast.error(`Failed to revoke subname: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error("Failed to revoke subname:", error);
+      toast.error(
+        `Failed to revoke subname: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
     } finally {
       setIsRevoking(false);
     }
@@ -134,7 +157,7 @@ export function SubnameDisplay({ subname }: SubnameDisplayProps) {
 
   /**
    * Handle updating all records on the blockchain
-   * 
+   *
    * This function:
    * 1. Converts local state back to blockchain format
    * 2. Filters out empty records
@@ -168,10 +191,14 @@ export function SubnameDisplay({ subname }: SubnameDisplayProps) {
         addresses: Object.keys(addresses).length > 0 ? addresses : undefined,
         contentHash: contentHash.trim() || undefined,
       });
-      toast.success('Records updated successfully');
+      toast.success("Records updated successfully");
     } catch (error) {
-      console.error('Failed to update subname:', error);
-      toast.error(`Failed to update records: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error("Failed to update subname:", error);
+      toast.error(
+        `Failed to update records: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
     } finally {
       setIsUpdating(false);
     }
@@ -181,21 +208,25 @@ export function SubnameDisplay({ subname }: SubnameDisplayProps) {
    * Text Record Management Functions
    * These functions handle adding, updating, and removing text records
    */
-  
+
   // Add a new empty text record
   const addTextRecord = () => {
     const newRecord: TextRecord = {
       id: `text-${Date.now()}`,
-      key: '',
-      value: ''
+      key: "",
+      value: "",
     };
     setTextRecords([...textRecords, newRecord]);
   };
 
   // Update a specific field in a text record
-  const updateTextRecord = (id: string, field: 'key' | 'value', value: string) => {
-    setTextRecords(records => 
-      records.map(record => 
+  const updateTextRecord = (
+    id: string,
+    field: "key" | "value",
+    value: string
+  ) => {
+    setTextRecords((records) =>
+      records.map((record) =>
         record.id === id ? { ...record, [field]: value } : record
       )
     );
@@ -203,7 +234,7 @@ export function SubnameDisplay({ subname }: SubnameDisplayProps) {
 
   // Remove a text record by ID
   const removeTextRecord = (id: string) => {
-    setTextRecords(records => records.filter(record => record.id !== id));
+    setTextRecords((records) => records.filter((record) => record.id !== id));
   };
 
   /**
@@ -211,26 +242,30 @@ export function SubnameDisplay({ subname }: SubnameDisplayProps) {
    * These functions handle adding, updating, and removing address records
    * Note: CoinType 60 (ETH) records cannot be edited or deleted
    */
-  
+
   // Add a new empty address record
   const addAddressRecord = () => {
     const newRecord: AddressRecord = {
       id: `addr-${Date.now()}`,
-      coinType: '',
-      address: ''
+      coinType: "",
+      address: "",
     };
     setAddressRecords([...addressRecords, newRecord]);
   };
 
   // Update a specific field in an address record
   // CoinType 60 (ETH) records cannot be edited
-  const updateAddressRecord = (id: string, field: 'coinType' | 'address', value: string) => {
-    setAddressRecords(records => 
-      records.map(record => {
+  const updateAddressRecord = (
+    id: string,
+    field: "coinType" | "address",
+    value: string
+  ) => {
+    setAddressRecords((records) =>
+      records.map((record) => {
         if (record.id === id) {
           // Prevent editing coinType 60 (ETH) records
-          if (record.coinType === '60' && field === 'coinType') {
-            toast.error('ETH address records cannot be modified');
+          if (record.coinType === "60" && field === "coinType") {
+            toast.error("ETH address records cannot be modified");
             return record;
           }
           return { ...record, [field]: value };
@@ -243,15 +278,17 @@ export function SubnameDisplay({ subname }: SubnameDisplayProps) {
   // Remove an address record by ID
   // CoinType 60 (ETH) records cannot be deleted
   const removeAddressRecord = (id: string) => {
-    const record = addressRecords.find(r => r.id === id);
-    if (record?.coinType === '60') {
-      toast.error('ETH address records cannot be deleted');
+    const record = addressRecords.find((r) => r.id === id);
+    if (record?.coinType === "60") {
+      toast.error("ETH address records cannot be deleted");
       return;
     }
-    setAddressRecords(records => records.filter(record => record.id !== id));
+    setAddressRecords((records) =>
+      records.filter((record) => record.id !== id)
+    );
   };
 
-  console.log("textRecords", textRecords)
+  console.log("textRecords", textRecords);
   return (
     <Card className="w-full max-w-4xl mx-auto">
       <CardHeader>
@@ -263,12 +300,15 @@ export function SubnameDisplay({ subname }: SubnameDisplayProps) {
             </CardDescription>
           </div>
           {/* Status badge showing the subname is active */}
-          <Badge variant="secondary" className="bg-green-100 text-green-700 border-green-200">
+          <Badge
+            variant="secondary"
+            className="bg-green-100 text-green-700 border-green-200"
+          >
             ✓ Active
           </Badge>
         </div>
       </CardHeader>
-      
+
       <CardContent className="space-y-6">
         {/* Subname Display Section */}
         <div className="text-center">
@@ -285,7 +325,6 @@ export function SubnameDisplay({ subname }: SubnameDisplayProps) {
 
         {/* Two Column Layout for Records */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          
           {/* Text Records Column */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -311,14 +350,18 @@ export function SubnameDisplay({ subname }: SubnameDisplayProps) {
                     <Input
                       placeholder="Key (e.g., email, url)"
                       value={record.key}
-                      onChange={(e) => updateTextRecord(record.id, 'key', e.target.value)}
+                      onChange={(e) =>
+                        updateTextRecord(record.id, "key", e.target.value)
+                      }
                       className="mb-2"
                     />
                     {/* Value input field */}
                     <Input
                       placeholder="Value"
                       value={record.value}
-                      onChange={(e) => updateTextRecord(record.id, 'value', e.target.value)}
+                      onChange={(e) =>
+                        updateTextRecord(record.id, "value", e.target.value)
+                      }
                     />
                   </div>
                   {/* Delete button for this record */}
@@ -361,7 +404,7 @@ export function SubnameDisplay({ subname }: SubnameDisplayProps) {
             <div className="space-y-3">
               {/* Map through all address records */}
               {addressRecords.map((record) => {
-                const isEthRecord = record.coinType === '60';
+                const isEthRecord = record.coinType === "60";
                 return (
                   <div key={record.id} className="flex gap-2 items-center">
                     <div className="flex-1">
@@ -369,16 +412,27 @@ export function SubnameDisplay({ subname }: SubnameDisplayProps) {
                       <Input
                         placeholder="Coin Type (e.g., ETH, BTC)"
                         value={record.coinType}
-                        onChange={(e) => updateAddressRecord(record.id, 'coinType', e.target.value)}
+                        onChange={(e) =>
+                          updateAddressRecord(
+                            record.id,
+                            "coinType",
+                            e.target.value
+                          )
+                        }
                         className="mb-2"
                         disabled={isEthRecord}
-                  
                       />
                       {/* Address input field */}
                       <Input
                         placeholder="Address"
                         value={record.address}
-                        onChange={(e) => updateAddressRecord(record.id, 'address', e.target.value)}
+                        onChange={(e) =>
+                          updateAddressRecord(
+                            record.id,
+                            "address",
+                            e.target.value
+                          )
+                        }
                         disabled={isEthRecord}
                       />
                       {/* Show indicator for ETH records */}
@@ -427,7 +481,8 @@ export function SubnameDisplay({ subname }: SubnameDisplayProps) {
               onChange={(e) => setContentHash(e.target.value)}
             />
             <p className="text-sm text-muted-foreground">
-              Set the content hash for your ENS name to point to decentralized content
+              Set the content hash for your ENS name to point to decentralized
+              content
             </p>
           </div>
         </div>
@@ -470,14 +525,15 @@ export function SubnameDisplay({ subname }: SubnameDisplayProps) {
                 <span>Revoking...</span>
               </div>
             ) : (
-              'Revoke Subname'
+              "Revoke Subname"
             )}
           </Button>
         </div>
-        
+
         {/* Warning about revocation */}
         <p className="text-xs text-muted-foreground text-center">
-          Update your records anytime. Revoking will permanently remove your subname and cannot be undone.
+          Update your records anytime. Revoking will permanently remove your
+          subname and cannot be undone.
         </p>
       </CardContent>
     </Card>

@@ -23,13 +23,15 @@ bun run preview
 
 ## Architecture Overview
 
-This is a React + TypeScript demo application showcasing JustAName SDK integration for ENS subname management. The application allows users to:
+This is a React + TypeScript demo application showcasing JustaName SDK integration for ENS subname management. The application allows users to:
+
 - Connect Ethereum wallets via Wagmi
 - Claim and manage ENS subnames
 - Update text records, addresses, and content hashes
 - Resolve ENS names to addresses
 
 ### Key Technology Stack
+
 - **Framework**: React 19 with TypeScript
 - **Build Tool**: Vite
 - **Blockchain**: Wagmi + @justaname.id/react SDK
@@ -37,6 +39,7 @@ This is a React + TypeScript demo application showcasing JustAName SDK integrati
 - **State Management**: React Query (TanStack Query)
 
 ### Project Structure
+
 - `src/providers.tsx`: Wraps app with JustANameProvider, WagmiProvider, and QueryClientProvider
 - `src/wagmi/config.ts`: Wagmi configuration for wallet connections
 - `src/config/constants.ts`: Environment variables and configuration
@@ -47,6 +50,7 @@ This is a React + TypeScript demo application showcasing JustAName SDK integrati
 ### Critical Configuration
 
 The app requires environment variables in `.env` file:
+
 ```env
 VITE_APP_ORIGIN=http://localhost:5173
 VITE_APP_DOMAIN=localhost:5173
@@ -55,9 +59,10 @@ VITE_APP_MAINNET_ENS_DOMAIN=<ens-domain>
 VITE_APP_MAINNET_API_KEY=<justaname-api-key>
 ```
 
-### JustAName SDK Integration
+### JustaName SDK Integration
 
-The JustANameProvider must wrap the entire application. Key hooks include:
+The JustaNameProvider must wrap the entire application. Key hooks include:
+
 - `useAddSubname`: Claim new subnames
 - `useAccountSubnames`: List user's subnames
 - `useUpdateSubname`: Update subname records

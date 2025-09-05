@@ -27,7 +27,7 @@ import { useAccount } from "wagmi";
  * - Visual feedback for availability status and loading states
  */
 export function SubnameForm() {
-  // Hook from JustAName SDK to handle subname creation
+  // Hook from JustaName SDK to handle subname creation
   const { addSubname, isAddSubnamePending } = useAddSubname();
   const { address } = useAccount();
   // Form state management
@@ -158,9 +158,9 @@ export function SubnameForm() {
             </div>
           </div>
 
-          {/* Optional Metadata Section */}
+          {/* Optional Text Records Section */}
           <div className="space-y-4">
-            <Label>Optional Metadata</Label>
+            <Label>Optional Text Records</Label>
             <div className="grid grid-cols-2 gap-3">
               {/* Metadata Key Input */}
               <div className="space-y-2">
