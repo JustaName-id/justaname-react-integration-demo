@@ -109,6 +109,12 @@ function MyComponent() {
         email: "alice@example.com",
         twitter: "@alice",
       },
+      addresses: {
+        2147492101: address,
+        // Note: For EVM chains other than Ethereum, coinType = chainId + 2147483648
+        // Ethereum uses coinType 60
+        // Example: Base (chainId 8453) = 8453 + 2147483648 = 2147492101
+      },
     });
   };
 
