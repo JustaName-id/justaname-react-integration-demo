@@ -111,7 +111,7 @@ function MyComponent() {
       },
       addresses: {
         2147492101: address,
-        // Note: For EVM chains other than Ethereum, coinType = chainId + 2147483648
+        // Note: For EVM chains other than Ethereum, coinType = toCoinType(chainId) from Viem
         // Ethereum uses coinType 60
         // Example: Base (chainId 8453) = 8453 + 2147483648 = 2147492101
       },
