@@ -6,6 +6,8 @@ import { SubnameDisplay } from "./components/subname/SubnameDisplay";
 import { SubnameForm } from "./components/subname/SubnameForm";
 import { SubnamesList } from "./components/subname/SubnamesList";
 import { ResolveEns } from "./components/subname/ResolveEns";
+import { ReverseResolveEns } from "./components/subname/ReverseResolveEns";
+import { PrimaryName } from "./components/subname/PrimaryName";
 import { DebugPanel } from "./components/debug/DebugPanel";
 import { useAccountSubnames } from "@justaname.id/react";
 import { Toaster } from "./components/ui/sonner";
@@ -57,9 +59,21 @@ export default function App() {
             </div>
           )}
 
+          {/* Primary Name - Only when connected */}
+          {isConnected && (
+            <div className="flex justify-center">
+              <PrimaryName />
+            </div>
+          )}
+
           {/* ENS Resolution - Always displayed */}
           <div className="flex justify-center">
             <ResolveEns />
+          </div>
+
+          {/* Reverse Resolution - Always displayed */}
+          <div className="flex justify-center">
+            <ReverseResolveEns />
           </div>
         </div>
 
