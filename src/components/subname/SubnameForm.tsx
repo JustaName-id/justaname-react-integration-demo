@@ -89,7 +89,9 @@ export function SubnameForm() {
           : undefined,
       addresses: {
         2147492101: address, // Base address, can be changed to any other cointype, computed by base chain ID (8453) + SLIP44_MSB (2147483648)
+        60: address
       },
+      overrideSignatureCheck : true
     });
   };
 

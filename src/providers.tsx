@@ -54,6 +54,7 @@ export const Providers: React.FC<ProviderProps> = ({ children }) => {
             chainId: 1,
             apiKey:  mainnetApiKey,
         }],
+        dev:true
     };
 
     return (
