@@ -4,5 +4,7 @@ const signInTtl = 1000 * 60 * 60 * 24;
 const mainnetProviderUrl = import.meta.env.VITE_APP_MAINNET_PROVIDER_URL || '';
 const mainnetEnsDomain = import.meta.env.VITE_APP_MAINNET_ENS_DOMAIN || '.eth';
 const mainnetApiKey = import.meta.env.VITE_APP_MAINNET_API_KEY || '';
+const reownProjectId = import.meta.env.VITE_APP_REOWN_PROJECT_ID || '';
+const jawApiKey = import.meta.env.VITE_APP_JAW_API_KEY || '';
 
-export { origin, domain, signInTtl, mainnetProviderUrl, mainnetEnsDomain, mainnetApiKey };
+export { origin, domain, signInTtl, mainnetProviderUrl, mainnetEnsDomain, mainnetApiKey, reownProjectId, jawApiKey };

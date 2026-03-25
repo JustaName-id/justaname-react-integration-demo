@@ -1,33 +1,19 @@
 "use client"
-import { useAccount, useDisconnect } from 'wagmi'
-import { useMemo, useState } from 'react'
+import { useAccount } from 'wagmi'
+import { useMemo } from 'react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Spinner } from '@/components/ui/spinner'
 import { useAccountSubnames } from '@justaname.id/react'
 import { mainnetEnsDomain } from '@/config/constants'
 
 export function Account() {
   const { address } = useAccount()
-  const { disconnect } = useDisconnect()
   const { accountSubnames } = useAccountSubnames()
-  const [isDisconnecting, setIsDisconnecting] = useState(false)
 
   const ensName = useMemo(() => {
     return accountSubnames.find((subname) => subname.ens.endsWith(mainnetEnsDomain as string))?.ens
   }, [accountSubnames])
-  const handleDisconnect = async () => {
-    setIsDisconnecting(true)
-    try {
-      await disconnect()
-    } catch (error) {
-      console.error('Disconnect failed:', error)
-    } finally {
-      setIsDisconnecting(false)
-    }
-  }
 
   const formatAddress = (addr: string) => {
     return `${addr.slice(0, 6)}...${addr.slice(-4)}`
@@ -45,9 +31,9 @@ export function Account() {
 
           <div className="space-y-2">
             <Badge variant="secondary" className="bg-green-100 text-green-700 border-green-200">
-              ✓ Connected
+              Connected
             </Badge>
-            
+
             {ensName ? (
               <div>
                 <div className="text-lg font-semibold">
@@ -66,23 +52,8 @@ export function Account() {
         </div>
       </CardHeader>
 
-      <CardContent>
-        <Button
-          variant="destructive"
-          size="lg"
-          className="w-full"
-          disabled={isDisconnecting}
-          onClick={handleDisconnect}
-        >
-          {isDisconnecting ? (
-            <div className="flex items-center gap-2">
-              <Spinner size="sm" className="text-white" />
-              <span>Disconnecting...</span>
-            </div>
-          ) : (
-            'Disconnect Wallet'
-          )}
-        </Button>
+      <CardContent className="flex justify-center">
+        <appkit-button />
       </CardContent>
     </Card>
   )
