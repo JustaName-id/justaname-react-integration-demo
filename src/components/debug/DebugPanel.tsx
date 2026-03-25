@@ -3,7 +3,7 @@ import { useAccount, useConnect } from 'wagmi'
 import { useAccountSubnames } from "@justaname.id/react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { origin, domain, mainnetEnsDomain, mainnetProviderUrl, mainnetApiKey } from "@/config/constants"
+import { origin, domain, mainnetEnsDomain, mainnetProviderUrl, jawApiKey } from "@/config/constants"
 
 export function DebugPanel() {
   const { isConnected, isConnecting, address, connector } = useAccount()
@@ -51,7 +51,7 @@ export function DebugPanel() {
             <div>DOMAIN: {domain || "❌ Missing"}</div>
             <div>MAINNET_ENS_DOMAIN: {mainnetEnsDomain || "❌ Missing"}</div>
             <div>PROVIDER_URL: {mainnetProviderUrl ? "✅ Set" : "❌ Missing"}</div>
-            <div>API_KEY: {mainnetApiKey ? "✅ Set" : "❌ Missing"}</div>
+            <div>API_KEY: {jawApiKey ? "✅ Set" : "❌ Missing"}</div>
           </div>
         </div>
 
