@@ -7,7 +7,7 @@ import { Spinner } from '@/components/ui/spinner'
 
 export function ConnectWallet() {
   const { isConnected, isConnecting, isReconnecting } = useAccount()
-  
+
   if (isConnecting || isReconnecting) {
     return (
       <Card className="w-full max-w-md mx-auto">
@@ -20,10 +20,10 @@ export function ConnectWallet() {
       </Card>
     )
   }
-  
+
   if (isConnected) {
     return <Account />
   }
-  
+
   return <WalletOptions />
 }
