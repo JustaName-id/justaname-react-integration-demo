@@ -1,11 +1,11 @@
-import { mainnetProviderUrl, reownProjectId, jawApiKey } from '@/config/constants'
+import { mainnetProviderUrl, reownProjectId, mainnetApiKey } from '@/config/constants'
 import { createStorage, http } from '@wagmi/core'
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
 import { mainnet } from '@reown/appkit/networks'
 import { jaw } from '@jaw.id/wagmi'
 
 const jawConnector = jaw({
-  apiKey: jawApiKey,
+  apiKey: mainnetApiKey,
   appName: 'JustaName Demo',
   defaultChainId: mainnet.id,
 })

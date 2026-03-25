@@ -5,7 +5,7 @@ import { QueryClient } from "@tanstack/query-core";
 import { wagmiAdapter, config, networks } from "@/wagmi/config";
 import { useState } from "react";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
-import { origin, domain, jawApiKey, mainnetEnsDomain, mainnetProviderUrl, reownProjectId } from "@/config/constants";
+import { origin, domain, mainnetApiKey, mainnetEnsDomain, mainnetProviderUrl, reownProjectId } from "@/config/constants";
 import type { JustaNameProviderConfig } from "@justaname.id/react";
 import { createAppKit } from "@reown/appkit/react";
 
@@ -44,7 +44,7 @@ export const Providers: React.FC<ProviderProps> = ({ children }) => {
 
     const missingVars = [];
     if (!mainnetProviderUrl) missingVars.push('MAINNET_PROVIDER_URL');
-    if (!jawApiKey) missingVars.push('MAINNET_API_KEY');
+    if (!mainnetApiKey) missingVars.push('MAINNET_API_KEY');
     if (!mainnetEnsDomain) missingVars.push('MAINNET_ENS_DOMAIN');
     if (!reownProjectId) missingVars.push('REOWN_PROJECT_ID');
 
@@ -66,7 +66,7 @@ export const Providers: React.FC<ProviderProps> = ({ children }) => {
         ensDomains: [{
             ensDomain: mainnetEnsDomain,
             chainId: 1,
-            apiKey: jawApiKey,
+            apiKey: mainnetApiKey,
         }],
     };
 
