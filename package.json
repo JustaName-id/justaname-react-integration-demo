@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
-    "@jaw.id/wagmi": "^0.1.4",
+    "@jaw.id/wagmi": "^1.0.0",
     "@justaname.id/react": "^0.3.217",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.14",
