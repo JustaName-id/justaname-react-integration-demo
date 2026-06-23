@@ -167,29 +167,68 @@ export function SubnameDisplay({ subname }: SubnameDisplayProps) {
   const handleUpdateRecords = async () => {
     setIsUpdating(true);
     try {
-      // Convert text records back to blockchain format
+      // A record update only writes the keys we send — omitted keys are left
+      // untouched on-chain. To delete a record we must therefore send its key
+      // explicitly with an empty string value so the backend clears it.
+
+      // Keys that existed on the subname before the user started editing.
+      const originalTextKeys = Object.values(subname.records.texts ?? {}).map(
+        (t) => t.key
+      );
+      const originalCoinTypes = Object.values(subname.records.coins ?? {}).map(
+        (c) => c.id.toString()
+      );
+
+      // Convert surviving text records back to blockchain format.
+      // Keep empty values so an in-place clear also propagates as a deletion.
       const text = textRecords.reduce((acc, record) => {
-        if (record.key.trim() && record.value.trim()) {
+        if (record.key.trim()) {
           acc[record.key] = record.value;
         }
         return acc;
       }, {} as Record<string, string>);
 
-      // Convert address records back to blockchain format
-      const addresses = addressRecords.reduce((acc, record) => {
-        if (record.coinType.trim() && record.address.trim()) {
-          acc[record.coinType] = record.address;
+      // Any originally-present text key that is now gone => explicit delete.
+      for (const key of originalTextKeys) {
+        if (!(key in text)) {
+          text[key] = "";
         }
-        return acc;
-      }, {} as Record<string, string>);
+      }
+
+      // Convert surviving address records back to blockchain format.
+      // NOTE: addresses must be sent as an array, not a Record. The SDK's
+      // sanitizeAddresses() strips empty-address entries from the object form,
+      // which would silently swallow our deletions — the array form is kept
+      // intact, so empty-string deletes survive and reach the backend.
+      const addresses = addressRecords
+        .filter((record) => record.coinType.trim())
+        .map((record) => ({
+          coinType: record.coinType,
+          address: record.address,
+        }));
+
+      // Any originally-present coin type that is now gone => explicit delete.
+      for (const coinType of originalCoinTypes) {
+        if (!addresses.some((a) => a.coinType === coinType)) {
+          addresses.push({ coinType, address: "" });
+        }
+      }
+
+      // For content hash, send "" (not undefined) when it was cleared so the
+      // existing value is removed rather than left in place. Only send undefined
+      // when there was nothing before and nothing now (nothing to change).
+      const hadContentHash = Boolean(subname.records.contentHash);
+      const trimmedContentHash = contentHash.trim();
+      const contentHashPayload =
+        trimmedContentHash || hadContentHash ? trimmedContentHash : undefined;
 
       // Update the subname with all records
       await updateSubname({
         ens: subname.ens,
         chainId: 1,
         text: Object.keys(text).length > 0 ? text : undefined,
-        addresses: Object.keys(addresses).length > 0 ? addresses : undefined,
-        contentHash: contentHash.trim() || undefined,
+        addresses: addresses.length > 0 ? addresses : undefined,
+        contentHash: contentHashPayload,
       });
       toast.success("Records updated successfully");
     } catch (error) {
